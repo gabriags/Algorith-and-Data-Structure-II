@@ -38,39 +38,40 @@ def search_h(currentNode):
 #Realiza una rotaciòn a izquierda de un AVL
 #nodeA es el nodo actual, nodoB es el hijo que rota y nodoC es el nieto que cambia de padre
 def rotateLeft(Tree, avlnode):
-  nodeA = avlnode
-  nodeB = avlnode.rightnode
-  if nodeB.leftnode != None:
-    nodeC = nodeB.leftnode
-    nodeC.parent = nodeA
+  avlnode.rightnode.parent = avlnode.parent
+  if avlnode.parent!=None:
+    if avlnode.parent.rightnode == avlnode:
+      avlnode.parent.rightnode = avlnode.rightnode
+    else:
+      avlnode.parent.leftnode = avlnode.rightnode
   else:
-    nodeC = None
-  nodeA.rightnode = nodeC
-  nodeB.parent = nodeA.parent
-  nodeA.parent = nodeB
-  nodeB.leftnode = nodeA
-  if nodeA == Tree.root:
-    Tree.root = nodeB
-  return nodeB
+    Tree.root = avlnode.rightnode
+    
+  avlnode.parent = avlnode.rightnode
+  if avlnode.rightnode.leftnode!=None:
+    avlnode.rightnode.leftnode.parent = avlnode
+  avlnode.rightnode = avlnode.rightnode.leftnode
+  avlnode.parent.leftnode = avlnode
 
 
-#Realiza una rotación a derecha de un AVL
+#Realiza una rotaciòn a derecha de un AVL
 #nodeA es el nodo actual, nodoB es el hijo que rota y nodoC es el nieto que cambia de padre
 def rotateRight(Tree, avlnode):
-  nodeA = avlnode
-  nodeB = avlnode.leftnode
-  if nodeB.rightnode != None:
-    nodeC = nodeB.rightnode
-    nodeC.parent = nodeA
+  
+  avlnode.leftnode.parent = avlnode.parent
+  if avlnode.parent!=None:
+    if avlnode.parent.leftnode == avlnode:
+      avlnode.parent.lefnode = avlnode.leftnode
+    else:
+      avlnode.parent.rightnode = avlnode.leftnode
   else:
-    nodeC = None
-  nodeA.leftnode = nodeC
-  nodeB.parent = nodeA.parent
-  nodeA.parent = nodeB
-  nodeB.rightnode = nodeA
-  if nodeA == Tree.root:
-    Tree.root = nodeB
-  return nodeB
+    Tree.root = avlnode.leftnode
+    
+  avlnode.parent = avlnode.leftnode
+  if avlnode.leftnode.rightnode!=None:
+    avlnode.leftnode.rightnode.parent = avlnode
+  avlnode.leftnode = avlnode.leftnode.rightnode
+  avlnode.parent.rightnode = avlnode
 
 
 ''' #Calcula el factor de balance de un AVL
@@ -120,6 +121,179 @@ def calculateBalanceR(L, currentNode, position):
   currentNode.value = f'|Node: {currentNode.value.value} bf: {currentNode.value.bf}|'
 
 
+#Ejercicio Nro 3
+#Recorre un arbol binario en post-orden
+#Reordena hacia arriba en caso de encontrar un nodo desbalanceado
+def reBalance(AVLTree):
+  if AVLTree.root == None:
+    return None
+  else:
+    reBalanceR(AVLTree,AVLTree.root)
+    return AVLTree
+
+
+def reBalanceR(B,currentNode):
+  if currentNode.leftnode != None:
+    reBalanceR(B,currentNode.leftnode)
+  if currentNode.rightnode != None:
+    reBalanceR(B,currentNode.rightnode)
+  if currentNode.bf!= 1 and currentNode.bf!=0 and currentNode.bf!=-1:
+    sortIt(B,currentNode)
+    calculateBalance(B) 
+
+def sortIt(B,currentNode):
+  if currentNode.bf<0:
+    #Caso especial
+    if currentNode.rightnode.bf==1:
+      rotateRight(B,currentNode.rightnode)
+      rotateLeft(B,currentNode)
+    #Desbalanceo hacia la derecha
+    else:
+      rotateLeft(B,currentNode)
+  elif currentNode.bf>0:
+    #Caso especial
+    if currentNode.leftnode.bf==-1:
+      rotateLeft(B,currentNode.leftnode)
+      rotateRight(B,currentNode)
+    #Desbalanceo hacia izquierda
+    else:
+      rotateRight(B,currentNode)
+
+
+#Ejercicio 4
+#Inserta un nuevo nodo en un arbol AVL
+#Busca la posicion donde insertar un nodo
+#Asegura el balanceo en insercion
+def insertBalanced(B, element, key):
+  Node = AVLNode()
+  Node.key = key
+  Node.value = element
+  Node.bf = 0
+  if B.root == None:
+    B.root = Node
+  else:
+    insertBalancedR(B,Node, B.root)
+
+def insertBalancedR(B,newNode, currentNode):
+  if newNode.key > currentNode.key:
+    if currentNode.rightnode == None:
+      currentNode.rightnode = newNode
+      newNode.parent = currentNode
+      update_bf(B,newNode,'insert')
+      sortUp(B,newNode)
+      return newNode.key
+    else:
+      return insertBalancedR(B,newNode, currentNode.rightnode)
+  elif newNode.key < currentNode.key:
+    if currentNode.leftnode == None:
+      currentNode.leftnode = newNode
+      newNode.parent = currentNode
+      update_bf(B,newNode,'insert')
+      sortUp(B,newNode)
+      return newNode.key
+    else:
+      return insertBalancedR(B,newNode, currentNode.leftnode)
+  else:
+    return None
+    
+def sortUp(Tree,currentNode):
+  if currentNode!=None:
+    if currentNode.bf!=0 and currentNode.bf!=1 and currentNode.bf!=-1:
+      sortIt(Tree,currentNode)
+    else:
+      sortUp(Tree,currentNode.parent)
+
+
+def update_bf(Tree,currentNode,key):
+  if currentNode!=None:
+    if currentNode.parent!= None and key=='insert':
+      if currentNode.parent.rightnode == currentNode:
+        currentNode.parent.bf = currentNode.parent.bf-1
+      elif currentNode.parent.leftnode == currentNode:
+        currentNode.parent.bf = currentNode.parent.bf+1
+      update_bf(Tree,currentNode.parent,'insert')
+      
+    elif currentNode.parent!=None and key=='delete':
+      if currentNode.parent.leftnode == currentNode:
+        currentNode.parent.bf = currentNode.parent.bf+1
+      elif currentNode.parent.leftnode == currentNode:
+        currentNode.parent.bf = currentNode.parent.bf-1
+      update_bf(Tree,currentNode.parent,'delete') 
+      
+#Ejercicio 5
+#Elimina la primera instancia de un elemento
+def deleteBalanced(B, element):
+  if B.root == None:
+    return None
+  else:
+    return deleteBalancedR(B, B.root, element)
+
+
+def deleteBalancedR(B, currentNode, element):
+  if currentNode.value == element:
+    return delete_nodeBalanced(B, currentNode)
+  else:
+    if currentNode.leftnode != None:
+      Left = deleteBalancedR(B, currentNode.leftnode, element)
+      if Left != None:
+        return Left
+    if currentNode.rightnode != None:
+      Right = deleteBalancedR(B, currentNode.rightnode, element)
+      if Right != None:
+        return Right
+
+
+def delete_nodeBalanced(B, currentNode):
+  #Prime caso: nodo sin hijos
+  if currentNode.leftnode == None and currentNode.rightnode == None:
+    update_bf(B,currentNode,'delete')
+    parent = currentNode.parent
+    if currentNode.parent == None:
+      B.root = None
+    elif currentNode.parent.leftnode == currentNode:
+      currentNode.parent.leftnode = None
+    else:
+      currentNode.parent.rightnode = None
+    sortUp(B,parent)
+  #Segundo caso: El nodo tiene solamente un hijo
+  #Caso que el hijo este a la izquierda
+  elif currentNode.leftnode != None and currentNode.rightnode == None:
+    update_bf(B,currentNode,'delete')
+    parent = currentNode.parent
+    if currentNode.parent == None:
+      B.root = currentNode.leftnode
+      B.root.parent = None
+    elif currentNode.parent.leftnode == currentNode:
+      currentNode.leftnode.parent = currentNode.parent
+      currentNode.parent.leftnode = currentNode.leftnode
+    else:
+      currentNode.leftnode.parent = currentNode.parent
+      currentNode.parent.rightnode = currentNode.leftnode
+    sortUp(B,parent)
+  #Caso que el hijo este a la derecha
+  elif currentNode.leftnode == None and currentNode.rightnode != None:
+    update_bf(B,currentNode,'delete')
+    parent = currentNode.parent
+    if currentNode.parent == None:
+      B.root = currentNode.rightnode
+      B.root.parent = None
+    elif currentNode.parent.leftnode == currentNode:
+      currentNode.rightnode.parent = currentNode.parent
+      currentNode.parent.leftnode = currentNode.rightnode
+    else:
+      currentNode.rightnode.parent = currentNode.parent
+      currentNode.parent.rightnode = currentNode.rightnode
+    sortUp(B,parent)
+  #Caso que el nodo tenga dos hijos
+  else:
+    #Busca el mayor de los menores
+    findNode = currentNode.leftnode
+    while findNode.rightnode != None:
+      findNode = findNode.rightnode
+    currentNode.value = findNode.value
+    return delete_nodeBalanced(B, findNode)
+  return currentNode.key    
+  
 
 #  ------------------------------Operaciones Basicas------------------------------
 #Inserta un nuevo nodo en un arbol AVL
@@ -130,26 +304,26 @@ def insertAVL(B, element, key):
   if B.root == None:
     B.root = Node
   else:
-    insertR(Node, B.root)
+    insertAVLR(Node, B.root)
 
 
 #Busca la posicion donde insertar un nodo
 #Si la key ya existe devuelve un error
-def insertR(newNode, currentNode):
+def insertAVLR(newNode, currentNode):
   if newNode.key > currentNode.key:
     if currentNode.rightnode == None:
       currentNode.rightnode = newNode
       newNode.parent = currentNode
       return newNode.key
     else:
-      return insertR(newNode, currentNode.rightnode)
+      return insertAVLR(newNode, currentNode.rightnode)
   elif newNode.key < currentNode.key:
     if currentNode.leftnode == None:
       currentNode.leftnode = newNode
       newNode.parent = currentNode
       return newNode.key
     else:
-      return insertR(newNode, currentNode.leftnode)
+      return insertAVLR(newNode, currentNode.leftnode)
   else:
     return None
 
