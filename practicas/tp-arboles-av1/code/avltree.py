@@ -36,7 +36,7 @@ def search_h(currentNode):
 
 
 #Realiza una rotaciòn a izquierda de un AVL
-#nodeA es el nodo actual, nodoB es el hijo que rota y nodoC es el nieto que cambia de padre
+#O(1)
 def rotateLeft(Tree, avlnode):
   avlnode.rightnode.parent = avlnode.parent
   if avlnode.parent!=None:
@@ -55,7 +55,7 @@ def rotateLeft(Tree, avlnode):
 
 
 #Realiza una rotaciòn a derecha de un AVL
-#nodeA es el nodo actual, nodoB es el hijo que rota y nodoC es el nieto que cambia de padre
+#O(1)
 def rotateRight(Tree, avlnode):
   
   avlnode.leftnode.parent = avlnode.parent
@@ -96,6 +96,9 @@ def calculateBalanceR(L, currentNode):
     calculateBalanceR(L, currentNode.rightnode) '''
 
 #Ejercicio Nro 2
+#Calcula el balance factor de cada nodo en un arbol
+#Recorre el arbol en amplitud
+#Devuelve el arbol con los valores de balance calculados
 def calculateBalance(AVLTree):
   if AVLTree.root == None:
     return None
@@ -141,6 +144,7 @@ def reBalanceR(B,currentNode):
     sortIt(B,currentNode)
     calculateBalance(B) 
 
+#Aplica las rotaciones necesesarias para balancear un subarbol
 def sortIt(B,currentNode):
   if currentNode.bf<0:
     #Caso especial
@@ -195,7 +199,8 @@ def insertBalancedR(B,newNode, currentNode):
       return insertBalancedR(B,newNode, currentNode.leftnode)
   else:
     return None
-    
+
+#Ordena cada nodo desde el actual hacia la raiz
 def sortUp(Tree,currentNode):
   if currentNode!=None:
     if currentNode.bf!=0 and currentNode.bf!=1 and currentNode.bf!=-1:
@@ -203,7 +208,8 @@ def sortUp(Tree,currentNode):
     else:
       sortUp(Tree,currentNode.parent)
 
-
+#Ordena el balance factor desde el nodo actual hacia la raiz
+#Suma balance factor en caso de insercion y resta en caso de delete
 def update_bf(Tree,currentNode,key):
   if currentNode!=None:
     if currentNode.parent!= None and key=='insert':
@@ -222,6 +228,7 @@ def update_bf(Tree,currentNode,key):
       
 #Ejercicio 5
 #Elimina la primera instancia de un elemento
+#Asegura el balanceo del arbol
 def deleteBalanced(B, element):
   if B.root == None:
     return None
