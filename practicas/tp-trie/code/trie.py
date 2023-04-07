@@ -166,6 +166,19 @@ def findPatternR(currentNode,word,maxLen,L):
         currentNode = currentNode.nextNode
   return
 
+#Determina si todos los elementos de un Trie T1 estan dentro de otro Trie T2
+def subTrie(T1,T2,string):
+  flag = True
+  currentNode = T1.children.head
+  while currentNode!= None:
+    word = string + currentNode.value.key
+    if currentNode.value.isEndOfWord:
+      flag = search(T2,word)
+    if flag == False:
+      return False
+    else:
+      printTrie(currentNode.value,word)
+    currentNode = currentNode.nextNode
 
 #Imprime un Trie
 #Utiliza length de linked list
