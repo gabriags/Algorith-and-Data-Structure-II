@@ -37,8 +37,6 @@ def hash(key,module):
     if type(key)==int:
         return key % module
     elif type(key)==str:
-        return ord(key) % module
-    elif type(key) == String:
         n = len(key)
         for i in range(0,n):
             if i==0:
@@ -54,6 +52,8 @@ def hash(key,module):
 #Devuelve el value asociado a la key o None si no lo encuentra
 def search(D,key):
     h = hash(key,len(D))
+    if D[h] == None:
+        return None
     currentNode = D[h].head
     while currentNode!=None:
         if currentNode.key==key:
@@ -96,7 +96,7 @@ def delete(D,key):
 #Actualiza el value de un nodo en un dictionary
 def update(D,key,value):
     m = len(D)
-    currentNode = D[h(key,m)]
+    currentNode = D[hash(key,m)]
     if currentNode==None:
         return None
     else:

@@ -76,5 +76,93 @@ def postalHash(k,m):
     return int(m*((key*A)%1))
 
 #Ejercicio 7
+'''
+idea
+    Preparacion
+        Crear una variable newString que formara la nueva cadena
+        Contar de 2 en 2 cada vez que inserta caracteres en newString
+        Recorrer la cadena siguiendo los pasos
+    Pasos
+        1. Buscar el primer caracter en el hash
+            a.Si existe, actualizamos su value contando las repeticiones
+            b.Si no existe, introducirlo en el hash
+        2.Actualizar el siguiente caracter a buscar
+            LLevar un flag con el ultimo caracter buscado
+            a. Si el nuevo caracter es distinto, insertar el anterior caracter con su value en el newString y borrarlo del hash
+            b. Lo mismo si se trata del ultimo caracter del recorrido
+        Comparar el tamaño de ambos string y devolver el menor
+'''
+#Comprime una palabra
+#Recibe un diccionario y una palabra
+#Devuelve la palabra o la compresion segun cual sea más corta
+#Coste O(n)
+def compresion(D,word):
+    n = len(word)
+    newString = ''
+    newStringlen = 0
+    lastInsert = word[0]
+    for i in range(0,n):
+        exist = search(D,word[i])
+        if exist == None:
+            insert(D,word[i],1)
+        else:
+            update(D,word[i],exist+1)
+        if lastInsert != word[i] or i == n-1:
+            newString += lastInsert+str(search(D,lastInsert))
+            newStringlen += 2
+            delete(D,lastInsert)
+            lastInsert = word[i]
+    if n>=newStringlen:
+        return newString
+    else:
+        return word
+        
 
+#Ejercicio 8
+'''
+Idea
+    Tomar el string S y insertar en D subcadenas de S del tamaño de P
+    Luego buscar si P existe en D
+    La cantidad de inserciones sera len(S)-len(P)
+    La complejidad es O(1) en el search
+    
+'''
+#Determina si una cadena S se encuentra como subcadena dentro de P
+#Devuelte True al encontrar la primera instancia de S en P
+#Devuelve False si no existe en P
+def isInside(D,S,P):
+    m = len(S)
+    n = len(P)
+    if m>=n:
+        for i in range(0,m-n+1):
+            insert(D,S[i:i+n],i)
+        exist = search(D,P)
+        if exist!=None:
+            return True
+        else:
+            return False
+        
+#Ejercicio 9
+#Determina si un S de enteros en subconjuto de T
+#Devuelve True o False segun sea
+def subSet(D,S,T):
+    m = len(S)
+    n = len(T)
+    if n>=m:
+        for i in range(0,n):
+            exist = search(D,T[i])
+            if exist!=None:
+                update(D,T[i],exist+1)
+            else:
+                insert(D,T[i],1)
 
+        for i in range(0,m):
+            exist = search(D,S[i])
+            if exist!=None:
+                if exist == 0:
+                    return False
+                else:
+                    update(D,S[i],exist-1)
+            else:
+                return False
+        return True
