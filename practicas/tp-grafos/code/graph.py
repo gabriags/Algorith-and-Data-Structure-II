@@ -1,4 +1,3 @@
-
 from algo1 import *
 from mylinkedlist import *
 from myqueue import *
@@ -6,10 +5,9 @@ from myqueue import *
 
 class vertex():
     value = None
-    color = "white"
-    d = 0
-    f = 0
     pi = None
+    d = 0
+    color = "white"
     ady = None
 
 
